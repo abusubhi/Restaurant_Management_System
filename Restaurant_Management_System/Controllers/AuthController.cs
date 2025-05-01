@@ -19,6 +19,9 @@ namespace Restaurant_Management_System.Controllers
 
             try
             {
+                if (string.IsNullOrWhiteSpace(Email))
+                    throw new Exception("Email and Password are required");
+
                 string connectionString = "Data Source=LAPTOP-QGFR6N5D;Initial Catalog=RMS;Integrated Security=True;Trust Server Certificate=True";
 
                 SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -49,10 +52,13 @@ namespace Restaurant_Management_System.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(input.Email) || string.IsNullOrWhiteSpace(input.NewPassword) || input.ConfirmNewPassword != input.NewPassword)
+                    throw new Exception("Email and Password are required");
+
                 string connectionString = "Data Source=LAPTOP-QGFR6N5D;Initial Catalog=RMS;Integrated Security=True;Trust Server Certificate=True";
 
                 SqlConnection sqlConnection = new SqlConnection(connectionString);
-                SqlCommand command = new SqlCommand("ResetPassword", sqlConnection);
+                SqlCommand command = new SqlCommand("ResetPassword1", sqlConnection);
                 command.CommandType = System.Data.CommandType.StoredProcedure;
 
                 command.Parameters.AddWithValue("@Email",input.Email);
@@ -64,10 +70,14 @@ namespace Restaurant_Management_System.Controllers
                 
                 if (await reader.ReadAsync())
                 {
-                    return Ok("Update Successful");
+                    int result = reader.GetInt32(0);
+                    if (result == 1)
+                        return Ok("Password reset successful.");
+                    else
+                        return BadRequest("Invalid or expired OTP.");
                 }
-                
-                return StatusCode(200, "Update Successful");
+
+                return StatusCode(500, "Unexpected response from server.");
             }
             catch (Exception ex)
             {
@@ -81,7 +91,7 @@ namespace Restaurant_Management_System.Controllers
         [HttpPost("MyCreateUser")]
         public IActionResult CreateUser([FromBody] SignUpDTO user)
         {
-            string connectionString = "Data Source=DESKTOP-8T8OGPF;Initial Catalog=RMS;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
+            string connectionString = "Data Source=LAPTOP-QGFR6N5D;Initial Catalog=RMS;Integrated Security=True;Trust Server Certificate=True";
 
             try
             {
@@ -129,7 +139,7 @@ namespace Restaurant_Management_System.Controllers
                 if (string.IsNullOrWhiteSpace(input.Email) || string.IsNullOrWhiteSpace(input.Password))
                     throw new Exception("Email and Password are required");
 
-                string connectionString = "Data Source=DESKTOP-D89OGE0\\SQLEXPRESS;Initial Catalog=RMS-;Integrated Security=True;Trust Server Certificate=True";
+                string connectionString = "Data Source=LAPTOP-QGFR6N5D;Initial Catalog=RMS;Integrated Security=True;Trust Server Certificate=True";
 
                 SqlConnection connection = new SqlConnection(connectionString);
                 SqlCommand command = new SqlCommand("User_Login", connection);
