@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DTOs\ItemsDTO\Response\" />
     <Folder Include="DTOs\OffersDTO\" />
   </ItemGroup>
 
