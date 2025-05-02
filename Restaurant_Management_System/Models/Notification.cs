@@ -16,7 +16,7 @@ public partial class Notification
     public string? CreatedBy { get; set; }
 
     public string? UpdatedBy { get; set; }
-
+    public string? Content { get; set; }
     public DateTime? CreationDate { get; set; }
 
     public DateTime? UpdationDate { get; set; }
