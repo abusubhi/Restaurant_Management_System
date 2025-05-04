@@ -7,10 +7,10 @@ using System.Runtime.CompilerServices;
 namespace Restaurant_Management_System.Service
 {
 
-    public class GetItem : IItem
+    public class ItemService : IItem
     {
         private readonly RMSDbContext _rMSDbContext;
-        public GetItem(RMSDbContext rMSDbContext)
+        public ItemService(RMSDbContext rMSDbContext)
         {
             _rMSDbContext = rMSDbContext ;
         }

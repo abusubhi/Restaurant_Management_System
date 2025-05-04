@@ -7,8 +7,8 @@ using Restaurant_Management_System.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IItem, GetItem>();
-builder.Services.AddScoped<INotification, GetNotification>();
+builder.Services.AddScoped<IItem, ItemService>();
+builder.Services.AddScoped<INotification, NotificationService>();
 
 builder.Services.AddScoped<AuthController>();
 // Add services to the container.
