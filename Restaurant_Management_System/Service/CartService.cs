@@ -1,6 +1,6 @@
 ﻿namespace Restaurant_Management_System.Service
 {
-    public class Cart
+    public class CartService
     {
     }
 }

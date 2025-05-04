@@ -4,10 +4,10 @@ using Restaurant_Management_System.Models;
 
 namespace Restaurant_Management_System.Service
 {
-    public class GetNotification : INotification
+    public class NotificationService : INotification
     {
             private readonly RMSDbContext _rMSDbContext;
-            public GetNotification(RMSDbContext rMSDbContext)
+            public NotificationService(RMSDbContext rMSDbContext)
                    {
                         _rMSDbContext = rMSDbContext;
                    }
