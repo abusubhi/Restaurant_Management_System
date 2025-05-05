@@ -58,24 +58,7 @@ namespace Restaurant_Management_System.Controllers
             }
         }
 
-        [HttpPost("GetNotificationsForUser")]
-        public async Task<IActionResult> GetNotificationsForUser(int userId)
-        {
-            try
-            {
-                if(userId > 0) { 
-                var notifications = await _notification.GetNotificationsForUser(userId);
-                if (notifications == null || notifications.Count == 0)
-                    return NotFound("No notifications found");
-                return Ok(notifications);
-                }
-                return NotFound("No notifications found");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+
 
     }
 }

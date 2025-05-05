@@ -11,7 +11,7 @@ public partial class CardPayment
 
     public string CardHolderName { get; set; } = null!;
 
-    public string ExpiryDate { get; set; } = null!;
+    public string ExpiryDate { get; set; } 
 
     public string Cvv { get; set; } = null!;
 
