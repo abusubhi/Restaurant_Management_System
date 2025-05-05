@@ -5,6 +5,6 @@ namespace Restaurant_Management_System.IService
     public interface IItem
     {
         public  Task<List<ItemDTO>> GetTopTenItems();
-        public  Task<ItemDTO> GetItemById(int itemId);
+        public  Task<ItemDetailsDTO> GetItemById(int itemId);
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant_Management_System.Controllers;
 using Restaurant_Management_System.DTOs.ItemsDTO.Request;
+using Restaurant_Management_System.Interfaces;
 using Restaurant_Management_System.IService;
 using Restaurant_Management_System.Models;
 using Restaurant_Management_System.Service;
@@ -9,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IItem, ItemService>();
 builder.Services.AddScoped<INotification, NotificationService>();
+builder.Services.AddScoped<IAddPaymentCard, AddPaymentCardService>();
+builder.Services.AddScoped<IAddAddress, AddAddressService>();
+
 
 builder.Services.AddScoped<AuthController>();
 // Add services to the container.
