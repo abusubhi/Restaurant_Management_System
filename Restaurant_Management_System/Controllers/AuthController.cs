@@ -8,7 +8,7 @@ using System.Net.Mail;
 using System.Net;
 using Restaurant_Management_System.Helper;
 using Restaurant_Management_System.Models;
-using Azure;
+using static System.Net.WebRequestMethods;
 namespace Restaurant_Management_System.Controllers
 {
     [Route("api/[controller]")]
@@ -17,17 +17,13 @@ namespace Restaurant_Management_System.Controllers
     {
         private readonly string _connectionString;
 
-      
-
         public AuthController(IConfiguration config)
         {
             _connectionString = config.GetConnectionString("DefaultConnection");
-            
         }
 
-
         [HttpPost]
-        [Route("Generate OTP")]
+        [Route("Generate OTP And Send TO Email")]
 
         public async Task<IActionResult> GenerateOTP([FromBody] string Email)
         {
@@ -44,13 +40,14 @@ namespace Restaurant_Management_System.Controllers
                 command.Parameters.AddWithValue("@Email", Email);
 
                 await sqlConnection.OpenAsync();
-                var resulte = await command.ExecuteNonQueryAsync();
-                
-                return Ok(new
-                {
-                    OTP = resulte,
-                });
+                var OTPCode = await command.ExecuteScalarAsync();
+                if (OTPCode == null)
+                     return BadRequest("Could not generate OTP. Make sure the email exists.");
 
+                await MailingHelper.SendEmail(Email, (int)OTPCode, "Reset Password OTP", "This is the OTP Code ");
+                
+
+                return Ok("OTP has been sent to your email.");
             }
             catch (Exception ex)
             {
@@ -58,6 +55,46 @@ namespace Restaurant_Management_System.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("Verify OTP")]
+        public async Task<IActionResult> VerifyOTP(VerifyDTO input)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(input.Email) || input.OTPCode <= 0)
+                    return BadRequest("Email and OTP code are required.");
+
+                using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+                {
+                    await sqlConnection.OpenAsync();
+
+                    
+                    SqlCommand command = new SqlCommand("VerifyOTP", sqlConnection);
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("@Email", input.Email);
+                    command.Parameters.AddWithValue("@EnteredOTP", input.OTPCode);
+
+                    var resultMessageParam = new SqlParameter("@ResultMessage", SqlDbType.NVarChar, 255)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    command.Parameters.Add(resultMessageParam);
+
+                    await command.ExecuteNonQueryAsync();
+
+                    string resultMessage = resultMessageParam.Value?.ToString();
+
+                    
+                    return Ok(resultMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         [HttpPost]
         [Route("RestPassword")]
@@ -80,7 +117,7 @@ namespace Restaurant_Management_System.Controllers
 
                 await sqlConnection.OpenAsync();
                 using var reader = await command.ExecuteReaderAsync();
-
+                
                 if (await reader.ReadAsync())
                 {
                     // Ensure the reader has enough columns
@@ -168,7 +205,6 @@ namespace Restaurant_Management_System.Controllers
 
                         return Ok(new { message = "user created successfully " , token = Token});
                     }
-
                 }
             }
             catch (SqlException ex)
@@ -231,7 +267,6 @@ namespace Restaurant_Management_System.Controllers
                 return StatusCode(500, $"An Error Was Occurred {ex.Message}");
             }
         }
-
 
     }
 }

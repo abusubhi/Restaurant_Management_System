@@ -139,6 +139,36 @@ public partial class RMSDbContext : DbContext
                 .HasConstraintName("FK__Cart__ItemID__151B244E");
         });
 
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => e.CartId).HasName("PK__Cart__51BCD7971AACB66E");
+
+            entity.ToTable("Cart");
+
+            entity.Property(e => e.CartId).HasColumnName("CartID");
+            entity.Property(e => e.ClientId).HasColumnName("ClientID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("isActive");
+            entity.Property(e => e.ItemId).HasColumnName("ItemID");
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ClientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cart__ClientID__5D95E53A");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cart__ItemID__5E8A0973");
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0BFBD3F1FC");

@@ -87,12 +87,12 @@ namespace Restaurant_Management_System.Controllers
             }
         }
 
-        [HttpGet("GetTopTenItems")]
-        public async Task<IActionResult> GetTopTenItems()
+        [HttpGet("Get Top Recommended Items")]
+        public async Task<IActionResult> GetTopRecommendedItems()
         {
             try
             {
-                var items = await _RMSDbContext.GetTopTenItems();
+                var items = await _RMSDbContext.GetTopRecommendedItems();
                 if (items == null || items.Count == 0)
                     return NotFound("No items found");
                 return Ok(items);

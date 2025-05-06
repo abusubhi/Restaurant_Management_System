@@ -1,6 +1,6 @@
 ﻿namespace Restaurant_Management_System.DTOs.ItemsDTO.Request
 {
-    public class ItemDTO
+    public class TopRecommendedItemsDTO
     {
         public int Id { get; set; }
         public string NameAr { get; set; } = null!;
@@ -13,6 +13,5 @@
 
         public Decimal Price { get; set; }
         public string Image { get; set; }
-
     }
 }

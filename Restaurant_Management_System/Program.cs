@@ -9,6 +9,10 @@ using Restaurant_Management_System.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+builder.Services.AddScoped<IOffers, OffersService>();
+builder.Services.AddScoped<IFavorite, FavoriteService>();
+builder.Services.AddScoped<ICart, CartService>();
 
 builder.Services.AddScoped<INotification, NotificationService>();
 builder.Services.AddScoped<IPaymentCard, PaymentCardService>();
