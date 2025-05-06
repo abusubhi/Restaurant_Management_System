@@ -17,7 +17,7 @@ public partial class Item
 
     public string? DescriptionEn { get; set; }
 
-    public float Price { get; set; }
+    public Decimal Price { get; set; }
 
     public string? CreatedBy { get; set; }
 

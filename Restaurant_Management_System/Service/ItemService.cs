@@ -2,9 +2,11 @@
 
 using Restaurant_Management_System.DTOs;
 using Restaurant_Management_System.DTOs.Category;
-using Restaurant_Management_System.DTOs.Items;
+
+using Restaurant_Management_System.DTOs.ItemsDTO.Request;
 using Restaurant_Management_System.IService;
 using Restaurant_Management_System.Models;
+
 
 namespace Restaurant_Management_System.Service
 {
@@ -21,21 +23,30 @@ namespace Restaurant_Management_System.Service
 
         public async Task<List<ItemDTO>> GetAllItems(PaginationParameters pagination)
         {
-
             return await _RMSDbContext.Items
-           .Skip((pagination.PageNumber - 1) * pagination.PageSize)
-          
-
+                      .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                      .Take(pagination.PageSize)
+                           .Select(i => new ItemDTO
+                           {
+                               Id = i.ItemId,
+                               NameAr = i.NameAr,
+                               NameEn = i.NameEn,
+                               Image = i.ItemImage,
+                               DescriptionAr = i.DescriptionAr,
+                               DescriptionEn = i.DescriptionEn,
+                               Price = (decimal)i.Price
+                           })
+                          .ToListAsync();
 
 
         }
-        
-        
+
+
         public async Task<List<ItemDTO>> GetTopTenItems()
         {
-            var topItems = await _rMSDbContext.Items
+            var topItems = await _RMSDbContext.Items
                 .GroupJoin(
-                    _rMSDbContext.OrderItems,
+                    _RMSDbContext.OrderItems,
                     item => item.ItemId,
                     orderItem => orderItem.ItemId,
                     (item, orderItems) => new
@@ -55,33 +66,33 @@ namespace Restaurant_Management_System.Service
                 })
                 .ToListAsync();
 
-            return  topItems;
+            return topItems;
         }
-        
+
         public async Task<ItemDetailsDTO> GetItemById(int itemId)
         {
             if (itemId <= 0)
                 throw new ArgumentException("Item ID must be greater than 0.", nameof(itemId));
 
-            return await (from Item in _rMSDbContext.Items
+            return await (from Item in _RMSDbContext.Items
 
-                         join Rate in _rMSDbContext.Rates
-                         on Item.ItemId equals Rate.ItemId
-                         where Rate.ItemId == itemId
-                         select new ItemDetailsDTO
-                         {
-                             Id = Item.ItemId,
-                             NameEn = Item.NameEn,
-                             NameAr = Item.NameAr,
-                             DescriptionEn = Item.DescriptionEn,
-                             DescriptionAr = Item.DescriptionAr,
-                             Price = Item.Price,
-                             Rate = Rate.ItemRate,
-                             NumberOfRevew = _rMSDbContext.Rates
-                                     .Count(r => r.ItemId == itemId)
+                          join Rate in _RMSDbContext.Rates
+                          on Item.ItemId equals Rate.ItemId
+                          where Rate.ItemId == itemId
+                          select new ItemDetailsDTO
+                          {
+                              Id = Item.ItemId,
+                              NameEn = Item.NameEn,
+                              NameAr = Item.NameAr,
+                              DescriptionEn = Item.DescriptionEn,
+                              DescriptionAr = Item.DescriptionAr,
+                              Price = (float)Item.Price,
+                              Rate = Rate.ItemRate,
+                              NumberOfRevew = _RMSDbContext.Rates
+                                      .Count(r => r.ItemId == itemId)
 
-                         }).FirstOrDefaultAsync();
-           
+                          }).FirstOrDefaultAsync();
+
         }
 
 
@@ -92,12 +103,12 @@ namespace Restaurant_Management_System.Service
         .Select(i => new ItemDTO
         {
             Id = i.ItemId,
-            NameAR = i.NameAr,
-            NameEN = i.NameEn,
-            ItemImage = i.ItemImage,
-            DescriptionAR = i.DescriptionAr,
-            DescriptionEN = i.DescriptionEn,
-            Price = i.Price
+            NameAr = i.NameAr,
+            NameEn = i.NameEn,
+            Image = i.ItemImage,
+            DescriptionAr = i.DescriptionAr,
+            DescriptionEn = i.DescriptionEn,
+            Price = (Decimal)i.Price
         })
        .ToListAsync();
         }
@@ -105,34 +116,37 @@ namespace Restaurant_Management_System.Service
 
         public async Task<List<TopRatedItemDTO>> GetTopRatedItems()
         {
-            return await (
-          from rate in _RMSDbContext.Rates
-          group rate by rate.ItemId into rateGroup
-          let averageRate = rateGroup.Average(r => r.ItemRate)
-          orderby averageRate ascending
-          select new { ItemId = rateGroup.Key, AverageRate = averageRate }
-      )
-      .Take(10)
-      .Join(
-          _RMSDbContext.Items,
-          rating => rating.ItemId,
-          item => item.ItemId,
-          (rating, item) => new TopRatedItemDTO
-          {
-              Id = item.ItemId,
-              NameAR = item.NameAr,
-              NameEN = item.NameEn,
-              DescriptionAR = item.DescriptionAr,
-              DescriptionEN = item.DescriptionEn,
-              ItemImage = item.ItemImage,
-              Price = item.Price,
-              ItemRate = rating.AverageRate
-          }
-      )
-      .ToListAsync();
+            var topRatedItems = await _RMSDbContext.Rates
+                .GroupBy(r => r.ItemId)
+                .Select(g => new
+                {
+                    ItemId = g.Key,
+                    AverageRate = g.Average(r => r.ItemRate)
+                })
+                .OrderByDescending(r => r.AverageRate)
+                .Take(10)
+                .Join(
+                    _RMSDbContext.Items,
+                    rating => rating.ItemId,
+                    item => item.ItemId,
+                    (rating, item) => new TopRatedItemDTO
+                    {
+                        Id = item.ItemId,
+                        NameAR = item.NameAr,
+                        NameEN = item.NameEn,
+                        DescriptionAR = item.DescriptionAr,
+                        DescriptionEN = item.DescriptionEn,
+                        ItemImage = item.ItemImage,
+                        Price = item.Price,
+                        ItemRate = rating.AverageRate
+                    }
+                )
+                .ToListAsync();
 
-
+            return topRatedItems;
         }
+
     }
+}
 
 

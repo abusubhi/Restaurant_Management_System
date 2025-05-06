@@ -4,10 +4,10 @@ using Restaurant_Management_System.Models;
 
 namespace Restaurant_Management_System.Service
 {
-    public class AddAddressService : IAddAddress
+    public class AddressService : IAddress
     {
         private readonly RMSDbContext _context;
-        public AddAddressService(RMSDbContext context)
+        public AddressService(RMSDbContext context)
         {
             _context = context;
         }

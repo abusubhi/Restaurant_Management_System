@@ -1,4 +1,4 @@
-﻿namespace Restaurant_Management_System.DTOs.Items
+﻿namespace Restaurant_Management_System.DTOs.ItemsDTO.Request
 {
     public class TopRatedItemDTO
     {

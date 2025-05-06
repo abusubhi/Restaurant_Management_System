@@ -2,8 +2,8 @@
 
 namespace Restaurant_Management_System.Interfaces
 {
-    public interface IAddPaymentCard
+    public interface IPaymentCard
     {
-        public Task<string> AddPaymentCard(AddPaymentCardDTO addPaymentCardDTO);
+         Task<string> AddPaymentCard(AddPaymentCardDTO addPaymentCardDTO);
     }
 }

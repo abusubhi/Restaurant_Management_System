@@ -1,8 +1,8 @@
 
-﻿using Restaurant_Management_System.DTOs;
-using Restaurant_Management_System.DTOs.Items;
+using Restaurant_Management_System.DTOs;
 
-﻿using Restaurant_Management_System.DTOs.ItemsDTO.Request;
+using Restaurant_Management_System.DTOs.ItemsDTO.Request;
+
 
 
 namespace Restaurant_Management_System.IService
@@ -18,8 +18,8 @@ namespace Restaurant_Management_System.IService
 
 
 
-        public  Task<List<ItemDTO>> GetTopTenItems();
-        public  Task<ItemDetailsDTO> GetItemById(int itemId);
+          Task<List<ItemDTO>> GetTopTenItems();
+        Task<ItemDetailsDTO> GetItemById(int itemId);
 
     }
 }
