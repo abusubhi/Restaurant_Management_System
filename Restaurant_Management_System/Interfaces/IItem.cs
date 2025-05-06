@@ -18,7 +18,7 @@ namespace Restaurant_Management_System.IService
 
 
 
-          Task<List<ItemDTO>> GetTopTenItems();
+          Task<List<TopRecommendedItemsDTO>> GetTopRecommendedItems();
         Task<ItemDetailsDTO> GetItemById(int itemId);
 
     }

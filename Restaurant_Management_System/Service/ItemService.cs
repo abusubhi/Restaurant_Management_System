@@ -42,7 +42,7 @@ namespace Restaurant_Management_System.Service
         }
 
 
-        public async Task<List<ItemDTO>> GetTopTenItems()
+        public async Task<List<TopRecommendedItemsDTO>> GetTopRecommendedItems()
         {
             var topItems = await _RMSDbContext.Items
                 .GroupJoin(
@@ -57,12 +57,16 @@ namespace Restaurant_Management_System.Service
                 )
                 .OrderByDescending(x => x.TotalQuantity)
                 .Take(10)
-                .Select(x => new ItemDTO
+                .Select(x => new TopRecommendedItemsDTO
                 {
                     Id = x.Item.ItemId,
                     NameEn = x.Item.NameEn,
                     NameAr = x.Item.NameAr,
-                    OrderCount = x.TotalQuantity
+                    DescriptionAr= x.Item.DescriptionAr,
+                    DescriptionEn = x.Item.DescriptionEn,
+                    Price = x.Item.Price,
+                    Image=x.Item.ItemImage
+                    
                 })
                 .ToListAsync();
 
