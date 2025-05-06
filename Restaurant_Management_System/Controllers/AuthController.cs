@@ -6,6 +6,9 @@ using Restaurant_Management_System.DTOs.AuthDTO.Response;
 using System.Data;
 using System.Net.Mail;
 using System.Net;
+using Restaurant_Management_System.Helper;
+using Restaurant_Management_System.Models;
+using Azure;
 namespace Restaurant_Management_System.Controllers
 {
     [Route("api/[controller]")]
@@ -14,10 +17,14 @@ namespace Restaurant_Management_System.Controllers
     {
         private readonly string _connectionString;
 
+      
+
         public AuthController(IConfiguration config)
         {
             _connectionString = config.GetConnectionString("DefaultConnection");
+            
         }
+
 
         [HttpPost]
         [Route("Generate OTP")]
@@ -73,16 +80,41 @@ namespace Restaurant_Management_System.Controllers
 
                 await sqlConnection.OpenAsync();
                 using var reader = await command.ExecuteReaderAsync();
-                
+
                 if (await reader.ReadAsync())
                 {
-                    int result = reader.GetInt32(0);
-                    if (result == 1)
-                        return Ok("Password reset successful.");
-                    else
-                        return BadRequest("Invalid or expired OTP.");
-                }
+                    // Ensure the reader has enough columns
+                    if (reader.FieldCount >= 2)
+                    {
+                        int result = reader.GetInt32(0); // success flag
+                        int userId = reader.GetInt32(1); // returned UserId
 
+                        if (result == 1)
+                        {
+                            var user = new User
+                            {
+                                UserId = userId,
+                                Email = input.Email,
+                                IsActive = true
+                            };
+                            var token = TokenHelper.GenerateJwtToken(user);
+                            return Ok(new { message = "Password reset successful.", token });
+                        }
+                        else
+                        {
+                            return BadRequest("Invalid or expired OTP.");
+                        }
+                    }
+                    else
+                    {
+                        return StatusCode(500, "Stored procedure did not return expected data.");
+                    }
+                }
+                else
+                {
+                    return StatusCode(500, "No data returned from stored procedure.");
+                }
+            
                 return StatusCode(500, "Unexpected response from server.");
             }
             catch (Exception ex)
@@ -95,7 +127,7 @@ namespace Restaurant_Management_System.Controllers
 
 
         [HttpPost("MyCreateUser")]
-        public IActionResult CreateUser([FromBody] SignUpDTO user)
+        public async Task<IActionResult> CreateUser([FromBody] SignUpDTO user)
         {
 
             try
@@ -118,10 +150,25 @@ namespace Restaurant_Management_System.Controllers
                         command.Parameters.AddWithValue("@Image", user.Image ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@CreatedBy", user.CreatedBy);
 
-                        command.ExecuteNonQuery();
+                       
+                        command.Parameters.Add("@UserId", SqlDbType.Int).Direction = ParameterDirection.Output;
+                        await command.ExecuteNonQueryAsync();
 
-                        return Ok(new { Message = "User created successfully" });
+                        int newUserId = Convert.ToInt32(command.Parameters["@UserId"].Value);
+
+                        var user1 = new User
+                        {
+                            UserId = newUserId,
+                            Email = user.Email,
+                            IsActive = true
+                        };
+                       var Token = TokenHelper.GenerateJwtToken(user1);
+                       
+                       
+
+                        return Ok(new { message = "user created successfully " , token = Token});
                     }
+
                 }
             }
             catch (SqlException ex)
@@ -164,11 +211,18 @@ namespace Restaurant_Management_System.Controllers
                     throw new Exception("Query Contains More Than One Element");
 
 
-                foreach (DataRow row in dataTable.Rows)
+                DataRow row = dataTable.Rows[0];
+
+                var user = new User
                 {
-                    response.UserId = Convert.ToInt32(row["UserId"]);
-                    response.Username = row["Username"].ToString();
-                }
+                    UserId = Convert.ToInt32(row["UserId"]),
+                    Email = input.Email,
+                    IsActive = Convert.ToBoolean(row["IsActive"])
+                };
+
+                response.UserId = user.UserId;
+                response.Username = row["Username"].ToString();
+                response.Token = TokenHelper.GenerateJwtToken(user);
 
                 return Ok(response);
             }
@@ -221,6 +275,7 @@ namespace Restaurant_Management_System.Controllers
                 return Ok("OTP has been sent to your email.");
             }
             catch (Exception ex)
+
             {
                 return StatusCode(500, ex.Message);
             }

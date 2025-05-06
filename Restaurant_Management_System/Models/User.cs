@@ -39,6 +39,8 @@ public partial class User
 
     public virtual ICollection<CardPayment> CardPayments { get; set; } = new List<CardPayment>();
 
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
     public virtual ICollection<Chat> ChatDrivers { get; set; } = new List<Chat>();
 
     public virtual ICollection<Chat> ChatUsers { get; set; } = new List<Chat>();

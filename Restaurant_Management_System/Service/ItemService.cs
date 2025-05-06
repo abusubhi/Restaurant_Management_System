@@ -1,23 +1,36 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using Restaurant_Management_System.DTOs.ItemsDTO.Request;
+
+using Restaurant_Management_System.DTOs;
+using Restaurant_Management_System.DTOs.Category;
+using Restaurant_Management_System.DTOs.Items;
 using Restaurant_Management_System.IService;
 using Restaurant_Management_System.Models;
-using System.Runtime.CompilerServices;
 
 namespace Restaurant_Management_System.Service
 {
-
     public class ItemService : IItem
     {
-        private readonly RMSDbContext _rMSDbContext;
-        public ItemService(RMSDbContext rMSDbContext)
+        private readonly RMSDbContext _RMSDbContext;
+        public ItemService(RMSDbContext RMSDbContext)
         {
-            _rMSDbContext = rMSDbContext ;
+
+
+            _RMSDbContext = RMSDbContext;
         }
 
 
+        public async Task<List<ItemDTO>> GetAllItems(PaginationParameters pagination)
+        {
 
+            return await _RMSDbContext.Items
+           .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+          
+
+
+
+        }
+        
+        
         public async Task<List<ItemDTO>> GetTopTenItems()
         {
             var topItems = await _rMSDbContext.Items
@@ -44,8 +57,7 @@ namespace Restaurant_Management_System.Service
 
             return  topItems;
         }
-
-
+        
         public async Task<ItemDetailsDTO> GetItemById(int itemId)
         {
             if (itemId <= 0)
@@ -69,22 +81,58 @@ namespace Restaurant_Management_System.Service
                                      .Count(r => r.ItemId == itemId)
 
                          }).FirstOrDefaultAsync();
-            //return await _rMSDbContext.Items
-            //    .Where(c => c.ItemId == itemId)
-            //    .Select(c => new ItemDTO
-            //    {
-            //        Id = c.ItemId,
-            //        Name = c.NameEn,
-            //        Description = c.DescriptionEn,
-            //        Price = c.Price,
-            //        Image = c.ItemImage,
-            //        OrderCount = _rMSDbContext.OrderItems
-            //            .Where(o => o.ItemId == itemId)
-            //            .Sum(o => (int?)o.Quantity) ?? 0
-            //    })
-            //    .FirstOrDefaultAsync();
+           
         }
 
 
+        public async Task<List<ItemDTO>> GetItemsByCategoryId(int categoryId)
+        {
+            return await _RMSDbContext.Items
+        .Where(i => i.CategoryId == categoryId)
+        .Select(i => new ItemDTO
+        {
+            Id = i.ItemId,
+            NameAR = i.NameAr,
+            NameEN = i.NameEn,
+            ItemImage = i.ItemImage,
+            DescriptionAR = i.DescriptionAr,
+            DescriptionEN = i.DescriptionEn,
+            Price = i.Price
+        })
+       .ToListAsync();
+        }
+
+
+        public async Task<List<TopRatedItemDTO>> GetTopRatedItems()
+        {
+            return await (
+          from rate in _RMSDbContext.Rates
+          group rate by rate.ItemId into rateGroup
+          let averageRate = rateGroup.Average(r => r.ItemRate)
+          orderby averageRate ascending
+          select new { ItemId = rateGroup.Key, AverageRate = averageRate }
+      )
+      .Take(10)
+      .Join(
+          _RMSDbContext.Items,
+          rating => rating.ItemId,
+          item => item.ItemId,
+          (rating, item) => new TopRatedItemDTO
+          {
+              Id = item.ItemId,
+              NameAR = item.NameAr,
+              NameEN = item.NameEn,
+              DescriptionAR = item.DescriptionAr,
+              DescriptionEN = item.DescriptionEn,
+              ItemImage = item.ItemImage,
+              Price = item.Price,
+              ItemRate = rating.AverageRate
+          }
+      )
+      .ToListAsync();
+
+
+        }
     }
-}
+
+

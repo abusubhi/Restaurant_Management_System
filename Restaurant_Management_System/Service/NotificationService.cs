@@ -1,3 +1,6 @@
+
+
+
 ﻿using Restaurant_Management_System.DTOs.NotificationsDTO.Response;
 using Restaurant_Management_System.IService;
 using Restaurant_Management_System.Models;
@@ -26,5 +29,6 @@ namespace Restaurant_Management_System.Service
                 .ToList();
             return not;
         }
-    }
+}
+    
 }

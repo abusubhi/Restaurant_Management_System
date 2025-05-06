@@ -19,6 +19,8 @@ public partial class RMSDbContext : DbContext
 
     public virtual DbSet<CardPayment> CardPayments { get; set; }
 
+    public virtual DbSet<Cart> Carts { get; set; }
+
     public virtual DbSet<Category> Categorys { get; set; }
 
     public virtual DbSet<Chat> Chats { get; set; }
@@ -46,11 +48,12 @@ public partial class RMSDbContext : DbContext
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__Addresse__091C2A1B3710342C");
+            entity.HasKey(e => e.AddressId).HasName("PK__Addresse__091C2A1BB4851D5A");
 
             entity.Property(e => e.AddressId).HasColumnName("AddressID");
             entity.Property(e => e.AddressHint).HasMaxLength(255);
@@ -72,12 +75,12 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Addresses__UserI__6FE99F9F");
+                .HasConstraintName("FK__Addresses__UserI__123EB7A3");
         });
 
         modelBuilder.Entity<CardPayment>(entity =>
         {
-            entity.HasKey(e => e.CardPaymentId).HasName("PK__CardPaym__5A1D9E48E7B63F2B");
+            entity.HasKey(e => e.CardPaymentId).HasName("PK__CardPaym__5A1D9E48CE8A0EA4");
 
             entity.ToTable("CardPayment");
 
@@ -103,16 +106,46 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.CardPayments)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CardPayme__UserI__73BA3083");
+                .HasConstraintName("FK__CardPayme__UserI__1332DBDC");
+        });
+
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => e.CartId).HasName("PK__Cart__51BCD797B818BDC9");
+
+            entity.ToTable("Cart");
+
+            entity.Property(e => e.CartId).HasColumnName("CartID");
+            entity.Property(e => e.ClientId).HasColumnName("ClientID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("isActive");
+            entity.Property(e => e.ItemId).HasColumnName("ItemID");
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ClientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cart__ClientID__14270015");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cart__ItemID__151B244E");
         });
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0BCF9E0080");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0BFBD3F1FC");
 
-            entity.HasIndex(e => e.NameAr, "UQ__Category__3329004B60ED8354").IsUnique();
+            entity.HasIndex(e => e.NameAr, "UQ__Category__3329004B51D68F06").IsUnique();
 
-            entity.HasIndex(e => e.NameEn, "UQ__Category__332920C2D3295261").IsUnique();
+            entity.HasIndex(e => e.NameEn, "UQ__Category__332920C27B192AD8").IsUnique();
 
             entity.Property(e => e.CreatedBy).IsUnicode(false);
             entity.Property(e => e.CreationDate)
@@ -135,7 +168,7 @@ public partial class RMSDbContext : DbContext
 
         modelBuilder.Entity<Chat>(entity =>
         {
-            entity.HasKey(e => e.ChatId).HasName("PK__Chat__A9FBE626EBF7234C");
+            entity.HasKey(e => e.ChatId).HasName("PK__Chat__A9FBE626023D3A6F");
 
             entity.ToTable("Chat");
 
@@ -155,16 +188,16 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Driver).WithMany(p => p.ChatDrivers)
                 .HasForeignKey(d => d.DriverId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Chat__DriverID__25518C17");
+                .HasConstraintName("FK__Chat__DriverID__17036CC0");
 
             entity.HasOne(d => d.User).WithMany(p => p.ChatUsers)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Chat__UserID__245D67DE");
+                .HasConstraintName("FK__Chat__UserID__160F4887");
         });
 
         modelBuilder.Entity<Favorite>(entity =>
         {
-            entity.HasKey(e => e.FavoriteId).HasName("PK__Favorite__CE74FAF5E5A8DA3D");
+            entity.HasKey(e => e.FavoriteId).HasName("PK__Favorite__CE74FAF51D0DAC25");
 
             entity.ToTable("Favorite");
 
@@ -179,21 +212,21 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Item).WithMany(p => p.Favorites)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__Favorite__ItemID__19DFD96B");
+                .HasConstraintName("FK__Favorite__ItemID__18EBB532");
 
             entity.HasOne(d => d.User).WithMany(p => p.Favorites)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__Favorite__UserID__18EBB532");
+                .HasConstraintName("FK__Favorite__UserID__17F790F9");
         });
 
         modelBuilder.Entity<Item>(entity =>
         {
-            entity.HasKey(e => e.ItemId).HasName("PK__Items__727E83EB23C0E2A1");
+            entity.HasKey(e => e.ItemId).HasName("PK__Items__727E83EB1BDBE302");
 
-            entity.HasIndex(e => e.NameEn, "UQ__Items__EE1C774F2FF4A8D1").IsUnique();
+            entity.HasIndex(e => e.NameEn, "UQ__Items__EE1C774F14DE5DF2").IsUnique();
 
-            entity.HasIndex(e => e.NameAr, "UQ__Items__EE1CD24C0C731092").IsUnique();
+            entity.HasIndex(e => e.NameAr, "UQ__Items__EE1CD24CB8F63BAD").IsUnique();
 
             entity.Property(e => e.ItemId).HasColumnName("ItemID");
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
@@ -225,16 +258,16 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Category).WithMany(p => p.Items)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Items__CategoryI__52593CB8");
+                .HasConstraintName("FK__Items__CategoryI__1AD3FDA4");
         });
 
         modelBuilder.Entity<ItemOption>(entity =>
         {
-            entity.HasKey(e => e.OptionId).HasName("PK__ItemOpti__92C7A1DF42FC27B8");
+            entity.HasKey(e => e.OptionId).HasName("PK__ItemOpti__92C7A1DF75125EC0");
 
-            entity.HasIndex(e => e.NameEn, "UQ__ItemOpti__EE1C774F8AF061DE").IsUnique();
+            entity.HasIndex(e => e.NameEn, "UQ__ItemOpti__EE1C774FB784F235").IsUnique();
 
-            entity.HasIndex(e => e.NameAr, "UQ__ItemOpti__EE1CD24CC2B18B00").IsUnique();
+            entity.HasIndex(e => e.NameAr, "UQ__ItemOpti__EE1CD24CE8C8845C").IsUnique();
 
             entity.Property(e => e.OptionId).HasColumnName("OptionID");
             entity.Property(e => e.IsRequired).HasDefaultValue(false);
@@ -250,12 +283,12 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Item).WithMany(p => p.ItemOptions)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ItemOptio__ItemI__5812160E");
+                .HasConstraintName("FK__ItemOptio__ItemI__19DFD96B");
         });
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E3240E55704");
+            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E327EC887D6");
 
             entity.Property(e => e.NotificationId).HasColumnName("NotificationID");
             entity.Property(e => e.CreatedBy).IsUnicode(false);
@@ -279,12 +312,12 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Notificat__UserI__01142BA1");
+                .HasConstraintName("FK__Notificat__UserI__1BC821DD");
         });
 
         modelBuilder.Entity<Offer>(entity =>
         {
-            entity.HasKey(e => e.OffersId).HasName("PK__Offers__6ACDC649EEE840B5");
+            entity.HasKey(e => e.OffersId).HasName("PK__Offers__6ACDC64934B6E1D3");
 
             entity.Property(e => e.Code).HasMaxLength(50);
             entity.Property(e => e.CreatedBy).IsUnicode(false);
@@ -318,12 +351,12 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Item).WithMany(p => p.Offers)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Offers__ItemID__14270015");
+                .HasConstraintName("FK__Offers__ItemID__1CBC4616");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF6A1670B7");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAFE4A98356");
 
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
             entity.Property(e => e.ClientId).HasColumnName("ClientID");
@@ -358,22 +391,22 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Client).WithMany(p => p.OrderClients)
                 .HasForeignKey(d => d.ClientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__ClientID__6383C8BA");
+                .HasConstraintName("FK__Orders__ClientID__208CD6FA");
 
             entity.HasOne(d => d.Driver).WithMany(p => p.OrderDrivers)
                 .HasForeignKey(d => d.DriverId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__DriverID__6477ECF3");
+                .HasConstraintName("FK__Orders__DriverID__2180FB33");
 
             entity.HasOne(d => d.Item).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__ItemID__628FA481");
+                .HasConstraintName("FK__Orders__ItemID__1F98B2C1");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>
         {
-            entity.HasKey(e => e.OrderItemsId).HasName("PK__OrderIte__D5BB253590625585");
+            entity.HasKey(e => e.OrderItemsId).HasName("PK__OrderIte__D5BB2535558EC221");
 
             entity.Property(e => e.OrderItemsId).HasColumnName("OrderItemsID");
             entity.Property(e => e.CreatedBy).IsUnicode(false);
@@ -394,17 +427,17 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Item).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__OrderItem__ItemI__6A30C649");
+                .HasConstraintName("FK__OrderItem__ItemI__1EA48E88");
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__OrderItem__Order__693CA210");
+                .HasConstraintName("FK__OrderItem__Order__1DB06A4F");
         });
 
         modelBuilder.Entity<Otp>(entity =>
         {
-            entity.HasKey(e => e.Otpid).HasName("PK__OTPs__5C2EC562B654D488");
+            entity.HasKey(e => e.Otpid).HasName("PK__OTPs__5C2EC5625747CD52");
 
             entity.ToTable("OTPs");
 
@@ -420,12 +453,12 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Otps)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__OTPs__UserID__06CD04F7");
+                .HasConstraintName("FK__OTPs__UserID__22751F6C");
         });
 
         modelBuilder.Entity<Rate>(entity =>
         {
-            entity.HasKey(e => e.RateId).HasName("PK__Rates__58A7CCBC5D622C03");
+            entity.HasKey(e => e.RateId).HasName("PK__Rates__58A7CCBC418AE1B9");
 
             entity.Property(e => e.RateId).HasColumnName("RateID");
             entity.Property(e => e.CreatedBy).IsUnicode(false);
@@ -444,23 +477,23 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.Item).WithMany(p => p.Rates)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Rates__ItemID__7A672E12");
+                .HasConstraintName("FK__Rates__ItemID__245D67DE");
 
             entity.HasOne(d => d.User).WithMany(p => p.Rates)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Rates__UserID__797309D9");
+                .HasConstraintName("FK__Rates__UserID__236943A5");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACC4FD7EE3");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACF0494D74");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E441139D6F").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Users__536C85E437DBEB1B").IsUnique();
 
-            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E38ACB25214").IsUnique();
+            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E3813A1AE2A").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053425BA8174").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053411C0383D").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
             entity.Property(e => e.CreatedBy).IsUnicode(false);
@@ -502,16 +535,16 @@ public partial class RMSDbContext : DbContext
             entity.HasOne(d => d.UserRole).WithMany(p => p.Users)
                 .HasForeignKey(d => d.UserRoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Users__UserRoleI__44FF419A");
+                .HasConstraintName("FK__Users__UserRoleI__25518C17");
         });
 
         modelBuilder.Entity<UserRole>(entity =>
         {
-            entity.HasKey(e => e.UserRoleId).HasName("PK__UserRole__3D978A55D10D5F6C");
+            entity.HasKey(e => e.UserRoleId).HasName("PK__UserRole__3D978A55E9A8E605");
 
             entity.ToTable("UserRole");
 
-            entity.HasIndex(e => e.RoleName, "UQ__UserRole__8A2B616001A592AD").IsUnique();
+            entity.HasIndex(e => e.RoleName, "UQ__UserRole__8A2B6160075817BE").IsUnique();
 
             entity.Property(e => e.UserRoleId).HasColumnName("UserRoleID");
             entity.Property(e => e.IsActive)

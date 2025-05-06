@@ -31,6 +31,8 @@ public partial class Item
 
     public int CategoryId { get; set; }
 
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
     public virtual Category Category { get; set; } = null!;
 
     public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
