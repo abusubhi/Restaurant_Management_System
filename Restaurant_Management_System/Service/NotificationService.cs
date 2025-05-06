@@ -1,6 +1,6 @@
 ﻿namespace Restaurant_Management_System.Service
 {
-    public class Item
+    public class NotificationService
     {
     }
 }

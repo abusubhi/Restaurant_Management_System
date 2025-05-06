@@ -2,11 +2,11 @@
 
 namespace Restaurant_Management_System.Service
 {
-    public class Offers
+    public class OffersService
     {
         private readonly string _connectionString;
 
-        public Offers(IConfiguration config)
+        public OffersService(IConfiguration config)
         {
             _connectionString = config.GetConnectionString("DefaultConnection");
         }
