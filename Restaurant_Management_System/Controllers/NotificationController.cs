@@ -7,11 +7,11 @@ namespace Restaurant_Management_System.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VoteficationController : ControllerBase
+    public class NotificationController : ControllerBase
     {
         private readonly INotification _notification;
 
-        public VoteficationController(INotification inotification)
+        public NotificationController(INotification inotification)
         {
             _notification = inotification;
         }

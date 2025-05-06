@@ -4,6 +4,6 @@ namespace Restaurant_Management_System.IService
 {
     public interface INotification
     {
-        public Task<List<NotificationsDTO>> GetNotificationsForUser(int userId);
+         Task<List<NotificationsDTO>> GetNotificationsForUser(int userId);
     }
 }

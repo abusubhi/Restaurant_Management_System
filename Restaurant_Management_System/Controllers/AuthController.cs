@@ -233,54 +233,5 @@ namespace Restaurant_Management_System.Controllers
         }
 
 
-        [HttpPost]
-        [Route("SendOTP")]
-        public async Task<IActionResult> SendOTP([FromBody] string email)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(email))
-                    return BadRequest("Email is required.");
-
-                using SqlConnection sqlConnection = new SqlConnection(_connectionString);
-                using SqlCommand command = new SqlCommand("GenerateOTP", sqlConnection);
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@Email", email);
-
-                await sqlConnection.OpenAsync();
-                var otp = await command.ExecuteScalarAsync();
-
-                if (otp == null)
-                    return BadRequest("Could not generate OTP. Make sure the email exists.");
-
-                // Send email
-                var smtpClient = new SmtpClient("smtp.yourserver.com")  // e.g., smtp.gmail.com
-                {
-                    Port = 587,
-                    Credentials = new NetworkCredential("your_email@example.com", "your_email_password"),
-                    EnableSsl = true,
-                };
-
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress("your_email@example.com"),
-                    Subject = "Your OTP Code",
-                    Body = $"Your OTP code is: {otp}",
-                    IsBodyHtml = false,
-                };
-                mailMessage.To.Add(email);
-
-                await smtpClient.SendMailAsync(mailMessage);
-
-                return Ok("OTP has been sent to your email.");
-            }
-            catch (Exception ex)
-
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-
     }
 }

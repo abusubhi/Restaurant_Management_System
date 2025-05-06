@@ -9,8 +9,8 @@ namespace Restaurant_Management_System.Controllers
     [ApiController]
     public class AddressController : ControllerBase
     {
-        private readonly IAddAddress _addAddressService;
-        public AddressController(IAddAddress addAddressService)
+        private readonly IAddress _addAddressService;
+        public AddressController(IAddress addAddressService)
         {
             _addAddressService = addAddressService;
         }

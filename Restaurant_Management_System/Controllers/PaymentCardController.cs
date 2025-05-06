@@ -9,8 +9,8 @@ namespace Restaurant_Management_System.Controllers
     [ApiController]
     public class PaymentCardController : ControllerBase
     {
-        private readonly IAddPaymentCard _addPaymentCardService;
-        public PaymentCardController(IAddPaymentCard addPaymentCardService)
+        private readonly IPaymentCard _addPaymentCardService;
+        public PaymentCardController(IPaymentCard addPaymentCardService)
         {
             _addPaymentCardService = addPaymentCardService;
         }

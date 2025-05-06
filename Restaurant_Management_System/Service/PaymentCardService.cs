@@ -5,10 +5,10 @@ using System.Text.RegularExpressions;
 
 namespace Restaurant_Management_System.Service
 {
-    public class AddPaymentCardService : IAddPaymentCard
+    public class PaymentCardService : IPaymentCard
     {
         private readonly RMSDbContext _context;
-        public AddPaymentCardService(RMSDbContext context)
+        public PaymentCardService(RMSDbContext context)
         {
             _context = context;
         }

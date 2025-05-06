@@ -11,7 +11,7 @@
 
         public string? DescriptionEn { get; set; }
 
-        public float Price { get; set; }
+        public Decimal Price { get; set; }
         public string Image { get; set; }
         public int OrderCount { get; set; }
         public decimal? Rate { get; set; }
